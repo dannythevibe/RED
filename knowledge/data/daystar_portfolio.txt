@@ -1,0 +1,39 @@
+Daystar Labs IP Portfolio: Detailed Breakdown
+
+1. STEM (Talent & Web3 Education)
+- Type: Specialized Web3 education platform (Coursera-style).
+- Mission: Provides certifications for decentralized roles, including DApp development, Web3 content writing, and blockchain-focused graphic design.
+
+2. CODURA (Developer Ecosystem)
+- Type: Discord-style ecosystem for developers.
+- Mission: Combines community with an Upwork-style marketplace, serving as a dedicated pipeline for agencies to hire vetted dev talent.
+
+3. TRACKSTACK (Fintech & Freelance Infrastructure)
+- Type: Critical infrastructure for the global freelance economy.
+- Features: 
+  - Payment Rail: Allows freelancers without PayPal or Stripe to receive international payments.
+  - Unified Workspace: A software bridge that aggregates messages and tools from multiple freelancing platforms into one central hub.
+
+4. NEBULA (Banking/Arbitrage)
+- Type: A hybrid banking app bridging Web2 and Web3.
+- Key Feature: Internal arbitrage engine for currency fluctuations.
+
+5. SOYL (Security)
+- Type: Decentralized Web3 password manager.
+- Tech: Utilizing Shamir’s Secret Sharing (SSS) for high-level key security.
+
+6. AETHER (Logistics)
+- Type: A cross-platform protocol for seamless file and data state sharing.
+- Scope: iOS, Android, Windows, and macOS synchronization.
+
+7. HIENA (GIG HUNTER) (Sales)
+- Type: Automated lead generation and outreach SaaS.
+- Mission: High-ticket client acquisition.
+
+8. MYLO (Health)
+- Type: Mental health companion app.
+- Features: AI-driven journaling for patients and biometric monitoring dashboard for therapists.
+
+9. Daystar Defense (R&D)
+- Type: Advanced tactical hardware and regional defense technology.
+- Focus: Nigeria and the broader African continent.

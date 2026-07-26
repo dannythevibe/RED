@@ -1,0 +1,17 @@
+speech_recognition
+pyttsx3
+pywebview
+mss
+requests
+Pillow
+numpy
+opencv-python
+winshell
+pywin32
+pyautogui
+flask
+spotipy
+faster-whisper
+keyboard
+sounddevice
+pygetwindow

@@ -1,0 +1,43 @@
+# RED Core .gitignore
+
+# Model files (too large for GitHub)
+models/*.gguf
+models/*.bin
+models/*.safetensors
+models/.cache/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+*.spec.bak
+
+# Audio cache
+cache/audio/
+
+# Logs
+logs/
+*.log
+
+# Compiled RED binary
+dist/
+*.exe
+red_build/
+
+# Config with secrets
+config/red_memory.json
+
+# Node modules
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini

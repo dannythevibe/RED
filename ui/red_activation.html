@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RED Core - Dynamic Island Activation</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+        :root {
+            /* RED Color Palette */
+            --red-core: #FF1E42;
+            --red-glow-1: #FF6B4A;
+            --red-glow-2: #B3001E;
+            --red-glow-3: #FF4D6D;
+            --island-bg: #000000;
+            --audio-pulse-speed: 1s;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #030303;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 
+           Phase 3: Viewport Compression
+           The main screen content scales down gently using an elastic cubic-bezier curve
+        */
+        .main-viewport {
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at center, #111 0%, #050505 100%);
+            position: relative;
+            transform-origin: center;
+            /* Phase 3 Transition & Retraction */
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), border-radius 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: hidden;
+            border-radius: 0px;
+            box-shadow: 0 0 0 rgba(0,0,0,0);
+        }
+
+        .main-viewport.active {
+            transform: scale(0.96);
+            border-radius: clamp(12px, 2vw, 32px);
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        }
+
+        /* Background Content for demonstration */
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: rgba(255, 255, 255, 0.1);
+            text-align: center;
+            user-select: none;
+        }
+        .content h1 { font-weight: 800; font-size: 4rem; margin: 0; letter-spacing: -2px; }
+        .content p { font-weight: 400; margin-top: 10px; }
+
+        /* SVG Perimeter that will animate the stroke */
+        .perimeter-svg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .edge-path {
+            fill: none;
+            stroke: var(--red-core);
+            /* Phase 4: Border-width dynamically adjusts via clamp and animation */
+            stroke-width: clamp(2px, 0.4vw, 6px);
+            stroke-linecap: round;
+            opacity: 0;
+            /* SVG Dash Animation (Phase 2 & 5) */
+            transition: stroke-dashoffset 0.45s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s;
+        }
+
+        /* Phase 4 & Loop: Active Mesh Glow */
+        .edge-path.pulse-active {
+            animation: ambient-mesh-glow 3s infinite alternate ease-in-out, audio-pulse var(--audio-pulse-speed) infinite alternate ease-in-out;
+        }
+
+        @keyframes ambient-mesh-glow {
+            0% { stroke: var(--red-core); filter: drop-shadow(0 0 10px var(--red-core)); }
+            33% { stroke: var(--red-glow-1); filter: drop-shadow(0 0 15px var(--red-glow-1)); }
+            66% { stroke: var(--red-glow-2); filter: drop-shadow(0 0 20px var(--red-glow-2)); }
+            100% { stroke: var(--red-glow-3); filter: drop-shadow(0 0 15px var(--red-glow-3)); }
+        }
+
+        @keyframes audio-pulse {
+            0% { stroke-width: clamp(2px, 0.4vw, 6px); filter: blur(2px) drop-shadow(0 0 8px var(--red-core)); opacity: 0.8; }
+            100% { stroke-width: clamp(4px, 0.8vw, 10px); filter: blur(5px) drop-shadow(0 0 25px var(--red-core)); opacity: 1; }
+        }
+
+        /* 
+           Phase 1: Anchor & Origin Point 
+           Dynamic Island sits top-center
+        */
+        .dynamic-island {
+            position: fixed;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%) scale(1);
+            width: 130px;
+            height: 36px;
+            background-color: var(--island-bg);
+            border-radius: 18px;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 0 rgba(255, 30, 66, 0);
+            border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            /* Spring recoil transition */
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease, width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.4s ease;
+        }
+
+        .dynamic-island.wake {
+            /* Phase 1: Expands slightly with spring recoil, glowing with intense crimson core */
+            transform: translateX(-50%) scale(1.05);
+            width: 220px;
+            box-shadow: 0 0 30px rgba(255, 30, 66, 0.6), inset 0 0 15px rgba(255, 30, 66, 0.4);
+            background: linear-gradient(145deg, #1f0005, #000000);
+            border-color: rgba(255, 30, 66, 0.8);
+        }
+
+        .island-content {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .wake .island-content {
+            opacity: 1;
+            transition-delay: 0.1s;
+        }
+
+        /* Subtle indicator active */
+        .audio-wave {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            height: 12px;
+        }
+        .audio-wave span {
+            display: block;
+            width: 2px;
+            height: 4px;
+            background: var(--red-core);
+            border-radius: 2px;
+        }
+        .wake .audio-wave span {
+            animation: wave 1.2s infinite ease-in-out;
+        }
+        .wake .audio-wave span:nth-child(2) { animation-delay: 0.2s; }
+        .wake .audio-wave span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes wave {
+            0%, 100% { height: 4px; }
+            50% { height: 12px; background: var(--red-glow-1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-viewport" id="viewport">
+        <!-- SVG for Edge Glow -->
+        <svg class="perimeter-svg" id="perimeterSvg">
+            <path id="leftPath" class="edge-path"></path>
+            <path id="rightPath" class="edge-path"></path>
+        </svg>
+
+        <div class="content">
+            <h1>RED</h1>
+            <p>Awaiting Activation...</p>
+        </div>
+    </div>
+
+    <!-- Dynamic Island Container -->
+    <div class="dynamic-island" id="island">
+        <div class="island-content">
+            <div class="audio-wave"><span></span><span></span><span></span></div>
+            <span>RED is listening</span>
+        </div>
+    </div>
+
+    <script>
+        const viewport = document.getElementById('viewport');
+        const island = document.getElementById('island');
+        const leftPath = document.getElementById('leftPath');
+        const rightPath = document.getElementById('rightPath');
+        
+        let isActive = false;
+        let audioPulseInterval;
+        let flowTimeout, scaleTimeout;
+
+        // Initialize SVG Paths
+        function initPaths() {
+            const w = viewport.clientWidth;
+            const h = viewport.clientHeight;
+            
+            // Phase 3: Auto-adjust dynamic units for radius
+            const vw = window.innerWidth;
+            const r = Math.max(12, Math.min(vw * 0.02, 32)); // approx clamp(12px, 2vw, 32px)
+            
+            // Calculate flanks of the Dynamic Island when active
+            // Island is 220px wide (110px from center). We eject light slightly inside its bounds
+            const activeIslandWidth = 220;
+            const flankOffset = (activeIslandWidth / 2) - 10;
+            
+            const startXL = (w / 2) - flankOffset;
+            const startXR = (w / 2) + flankOffset;
+
+            // Generate exact perimeter path hugging the borders with rounded corners
+            const leftD = `
+                M ${startXL},2 
+                L ${r},2 
+                Q 2,2 2,${r} 
+                L 2,${h - r} 
+                Q 2,${h - 2} ${r},${h - 2} 
+                L ${w/2},${h - 2}
+            `;
+            
+            const rightD = `
+                M ${startXR},2 
+                L ${w - r},2 
+                Q ${w - 2},2 ${w - 2},${r} 
+                L ${w - 2},${h - r} 
+                Q ${w - 2},${h - 2} ${w - r},${h - 2} 
+                L ${w/2},${h - 2}
+            `;
+
+            leftPath.setAttribute('d', leftD.trim().replace(/\s+/g, ' '));
+            rightPath.setAttribute('d', rightD.trim().replace(/\s+/g, ' '));
+
+            // Setup lengths for dash animation
+            const lenL = leftPath.getTotalLength();
+            const lenR = rightPath.getTotalLength();
+
+            leftPath.style.strokeDasharray = lenL;
+            rightPath.style.strokeDasharray = lenR;
+            
+            if(!isActive) {
+                leftPath.style.strokeDashoffset = lenL;
+                rightPath.style.strokeDashoffset = lenR;
+                leftPath.style.opacity = 0;
+                rightPath.style.opacity = 0;
+            }
+        }
+
+        window.addEventListener('resize', initPaths);
+        // Delay init slightly to ensure DOM dimensions are computed
+        setTimeout(initPaths, 50);
+
+        island.addEventListener('click', () => {
+            if (!isActive) {
+                // PHASE 1: WAKE / TRIGGER
+                isActive = true;
+                island.classList.add('wake');
+                
+                // Recalculate paths in case of resize prior to wake
+                initPaths();
+                
+                const lenL = leftPath.getTotalLength();
+                const lenR = rightPath.getTotalLength();
+
+                // PHASE 2: FLUID EDGE PROPAGATION
+                // Triggered slightly after island expands
+                flowTimeout = setTimeout(() => {
+                    leftPath.style.opacity = 1;
+                    rightPath.style.opacity = 1;
+                    
+                    leftPath.style.strokeDashoffset = 0;
+                    rightPath.style.strokeDashoffset = 0;
+
+                    // PHASE 3: VIEWPORT COMPRESSION & ACTIVE LOOP
+                    // Wait for edge loop to close (~300-450ms)
+                    scaleTimeout = setTimeout(() => {
+                        viewport.classList.add('active');
+                        leftPath.classList.add('pulse-active');
+                        rightPath.classList.add('pulse-active');
+                        
+                        // PHASE 4: AUDIO BINDING (Simulation)
+                        // Adjusting pulse speed dynamically
+                        audioPulseInterval = setInterval(() => {
+                            // Randomize pulse duration between 0.6s and 1.5s
+                            const speed = (Math.random() * 0.9 + 0.6).toFixed(2);
+                            document.documentElement.style.setProperty('--audio-pulse-speed', `${speed}s`);
+                        }, 800);
+                        
+                    }, 400); // Trigger compression as edges meet
+
+                }, 150); // Phase 1 Spring recoil delay
+
+            } else {
+                // PHASE 5: RETRACTION / DISMISSAL
+                isActive = false;
+                
+                // Clear simulated audio binding and timeouts
+                clearInterval(audioPulseInterval);
+                clearTimeout(flowTimeout);
+                clearTimeout(scaleTimeout);
+
+                // Stop active pulse animations to freeze current state
+                leftPath.classList.remove('pulse-active');
+                rightPath.classList.remove('pulse-active');
+                
+                // Restore viewport scale and island shape
+                viewport.classList.remove('active');
+                island.classList.remove('wake');
+                
+                document.documentElement.style.setProperty('--audio-pulse-speed', `1s`);
+
+                // Shrink perimeter glow back up the side edges
+                const lenL = leftPath.getTotalLength();
+                const lenR = rightPath.getTotalLength();
+                
+                leftPath.style.strokeDashoffset = lenL;
+                rightPath.style.strokeDashoffset = lenR;
+                
+                // Fade out strokes after retraction completes
+                setTimeout(() => {
+                    if (!isActive) {
+                        leftPath.style.opacity = 0;
+                        rightPath.style.opacity = 0;
+                    }
+                }, 400);
+            }
+        });
+    </script>
+</body>
+</html>
