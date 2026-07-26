@@ -6,6 +6,14 @@ models/*.bin
 models/*.safetensors
 models/.cache/
 
+# HuggingFace & AI caches
+.cache/
+.cache/huggingface/
+.cache/puppeteer/
+
+# IDE / Antigravity extensions
+.antigravity/
+
 # Python
 __pycache__/
 *.py[cod]
@@ -36,6 +44,10 @@ config/red_memory.json
 
 # Node modules
 node_modules/
+
+# .NET build outputs
+ui/src/DynamicWin/bin/
+ui/src/DynamicWin/obj/
 
 # OS
 .DS_Store
